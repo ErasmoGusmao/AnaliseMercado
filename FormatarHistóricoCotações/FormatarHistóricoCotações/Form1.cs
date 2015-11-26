@@ -20,7 +20,7 @@ namespace FormatarHistóricoCotações
         private void button1_Click(object sender, EventArgs e)
         {
             HistóricoCotação histórico = new HistóricoCotação();
-            histórico.FormatarArquivo();
+            histórico.FormatarArquivoDeCotações();
         }
 
         private void button2_Click(object sender, EventArgs e)
