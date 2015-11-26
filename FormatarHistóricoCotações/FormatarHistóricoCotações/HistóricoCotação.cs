@@ -39,16 +39,6 @@ namespace FormatarHistóricoCotações
                     {
                         string linhaCotação = reader.ReadLine(); //Ler linha do arquivo original
 
-
-/*                      string dataString = linhaCotação.Substring(2, 8);
-                        DateTime data = DateTime.ParseExact(dataString, "yyyymmdd", DateTimeFormatInfo.InvariantInfo);
-*/
-
-/*                       string testeData = "20151125";
-                         DateTime data = DateTime.ParseExact(testeData, "yyyymmdd", DateTimeFormatInfo.InvariantInfo);
-                         writer.WriteLine(data.ToString("dd/mm/yyyy"));
-*/
-
                          writer.WriteLine(linhaCotação.Substring(0, 2) + "\t" + linhaCotação.Substring(2, 8) + "\t" + linhaCotação.Substring(10, 2)
                             + "\t" + linhaCotação.Substring(12, 12) + "\t" + linhaCotação.Substring(24, 3) + "\t" + linhaCotação.Substring(27, 12)
                             + "\t" + linhaCotação.Substring(39, 10) + "\t" + linhaCotação.Substring(49, 3) + "\t" + linhaCotação.Substring(52, 4)
@@ -71,6 +61,25 @@ namespace FormatarHistóricoCotações
                            linhaCotação.Substring(230, 12),linhaCotação.Substring(242, 3));
 */                       
 
+                    }
+                }
+            }
+        }
+
+        public void TratarDataTeste() { //Testar algorítio de formatação de data
+            using (StreamReader reader = new StreamReader(@"C:\Users\Erasmo\Documents\GitHub\AnaliseMercado\FormatarHistóricoCotações\Arquivos de Testes\Arquivo de Data AAAAMMDD.txt"))
+            {
+                using (StreamWriter writer = new StreamWriter(@"C:\Users\Erasmo\Documents\GitHub\AnaliseMercado\FormatarHistóricoCotações\Arquivos de Testes\Arquivo de Data CORRIGIDO.txt", false)) {
+
+/*                        string testeData = "20151125";
+                          DateTime data = DateTime.ParseExact(testeData, "yyyymmdd", DateTimeFormatInfo.InvariantInfo);
+                          writer.WriteLine(data.ToString("dd/mm/yyyy"));
+*/
+                    while (!reader.EndOfStream) 
+                    { 
+                    string DataYYYYMMDD = reader.ReadLine(); //Ler linha do arquivo
+                    DateTime DataCorrigida = DateTime.ParseExact(DataYYYYMMDD, "yyyymmdd", DateTimeFormatInfo.InvariantInfo); //Converte um String em DateTime
+                    writer.WriteLine(DataCorrigida.ToString("dd/mm/yyyy")); //Escreve a data corrigida no novo arquivo
                     }
                 }
             }

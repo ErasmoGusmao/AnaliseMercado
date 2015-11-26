@@ -22,5 +22,11 @@ namespace FormatarHistóricoCotações
             HistóricoCotação histórico = new HistóricoCotação();
             histórico.FormatarArquivo();
         }
+
+        private void button2_Click(object sender, EventArgs e)
+        {
+            HistóricoCotação históricoData = new HistóricoCotação();
+            históricoData.TratarDataTeste();
+        }
     }
 }
