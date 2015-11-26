@@ -77,12 +77,33 @@ namespace FormatarHistóricoCotações
 */
                     while (!reader.EndOfStream) 
                     { 
-                    string DataYYYYMMDD = reader.ReadLine(); //Ler linha do arquivo
-                    DateTime DataCorrigida = DateTime.ParseExact(DataYYYYMMDD, "yyyymmdd", DateTimeFormatInfo.InvariantInfo); //Converte um String em DateTime
-                    writer.WriteLine(DataCorrigida.ToString("dd/mm/yyyy")); //Escreve a data corrigida no novo arquivo
+                    string LinhaDoArquivo = reader.ReadLine(); //Ler linha do arquivo
+                    
+                    switch (LinhaDoArquivo.Substring(0,2))
+                    {
+                        case "00": 
+                            DateTime DataCorrigidaCabeçalho = DateTime.ParseExact(LinhaDoArquivo.Substring(11,8), "yyyymmdd", DateTimeFormatInfo.InvariantInfo);    //Converte um String em DateTime do cabeçalho
+                            writer.WriteLine(LinhaDoArquivo.Substring(0,2)+"\t"+LinhaDoArquivo.Substring(2,9)+"\t"+DataCorrigidaCabeçalho.ToString("dd/mm/yyyy"));
+                            break;
+
+                        case "01":
+                            DateTime DataCorrigidaCotação = DateTime.ParseExact(LinhaDoArquivo.Substring(6, 8), "yyyymmdd", DateTimeFormatInfo.InvariantInfo);    //Converte um String em DateTime as cotações
+                            writer.WriteLine(LinhaDoArquivo.Substring(0, 2) + "\t" + LinhaDoArquivo.Substring(2, 4) + "\t" + DataCorrigidaCotação.ToString("dd/mm/yyyy") + "\t" + LinhaDoArquivo.Substring(14,4)+"\t"+LinhaDoArquivo.Substring(18,1));
+                            break;
+
+                        case "99":
+                            writer.WriteLine(LinhaDoArquivo.Substring(0,2)+"\t"+LinhaDoArquivo.Substring(2,3));
+                            break;
+
+                        default: writer.WriteLine("ERRO NO FORMATO DO ARQUIVO"); break;
+                    }
                     }
                 }
             }
+        }
+
+        public void FormatarArquivoDeCotações() { 
+        
         }
     }
 }
