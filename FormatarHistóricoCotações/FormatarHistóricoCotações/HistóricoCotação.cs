@@ -29,7 +29,7 @@ namespace FormatarHistóricoCotações
                 {
                     using (StreamReader reader = new StreamReader(caminhoDoArquivo))
                     {
-                        using (StreamWriter writer = new StreamWriter(caminhoParaSalvarArqivo, true))
+                        using (StreamWriter writer = new StreamWriter(caminhoParaSalvarArqivo, true)) //true não sobrescreve no arquivo; false sobrescreve
                         {
 
                             try
@@ -40,8 +40,9 @@ namespace FormatarHistóricoCotações
                                     switch (LinhaDoArquivo.Substring(0, 2))
                                     {
                                         case "00":
-                                            DateTime DataGeraçãoArquivo = DateTime.ParseExact(LinhaDoArquivo.Substring(23, 8), "yyyymmdd", DateTimeFormatInfo.InvariantInfo);    //Converte um String em DateTime do cabeçalho
-                                            writer.WriteLine(LinhaDoArquivo.Substring(0, 2) + "\t" + LinhaDoArquivo.Substring(2, 13) + "\t" + LinhaDoArquivo.Substring(15, 8) + "\t" + DataGeraçãoArquivo.ToString("dd/mm/yyyy") + "\t" + LinhaDoArquivo.Substring(31, 214));  //Escreve o Cabeçalho
+                                            //Não escreve nada
+                                            //DateTime DataGeraçãoArquivo = DateTime.ParseExact(LinhaDoArquivo.Substring(23, 8), "yyyymmdd", DateTimeFormatInfo.InvariantInfo);    //Converte um String em DateTime do cabeçalho
+                                            //writer.WriteLine(LinhaDoArquivo.Substring(0, 2) + "\t" + LinhaDoArquivo.Substring(2, 13) + "\t" + LinhaDoArquivo.Substring(15, 8) + "\t" + DataGeraçãoArquivo.ToString("dd/mm/yyyy") + "\t" + LinhaDoArquivo.Substring(31, 214));  //Escreve o Cabeçalho
                                             break;
 
                                         case "01":
@@ -71,8 +72,9 @@ namespace FormatarHistóricoCotações
                                             break;
 
                                         case "99":
-                                            DateTime DataGeraçãoArquivoFim = DateTime.ParseExact(LinhaDoArquivo.Substring(23, 8), "yyyymmdd", DateTimeFormatInfo.InvariantInfo);    //Converte um String em DateTime do fim do arquivo
-                                            writer.WriteLine(LinhaDoArquivo.Substring(0, 2) + "\t" + LinhaDoArquivo.Substring(2, 13) + "\t" + LinhaDoArquivo.Substring(15, 8) + "\t" + DataGeraçãoArquivoFim.ToString("dd/mm/yyyy") + "\t" + LinhaDoArquivo.Substring(31, 11) + "\t" + LinhaDoArquivo.Substring(42, 203));  //Escreve o Cabeçalho
+                                            //Não escreve nada
+                                            //DateTime DataGeraçãoArquivoFim = DateTime.ParseExact(LinhaDoArquivo.Substring(23, 8), "yyyymmdd", DateTimeFormatInfo.InvariantInfo);    //Converte um String em DateTime do fim do arquivo
+                                            //writer.WriteLine(LinhaDoArquivo.Substring(0, 2) + "\t" + LinhaDoArquivo.Substring(2, 13) + "\t" + LinhaDoArquivo.Substring(15, 8) + "\t" + DataGeraçãoArquivoFim.ToString("dd/mm/yyyy") + "\t" + LinhaDoArquivo.Substring(31, 11) + "\t" + LinhaDoArquivo.Substring(42, 203));  //Escreve o Cabeçalho
                                             break;
                                     }
                                 }
@@ -95,16 +97,46 @@ namespace FormatarHistóricoCotações
             }
         }
 
-        public void ConcatenaArquivos(string caminhoDoArquivo) 
+        public void ConcatenaArquivos(string caminhoDoDiretorio) 
         {
-            System.IO.DirectoryInfo Diretório = new DirectoryInfo(caminhoDoArquivo);
             int NumeroDeArquivos;
-            //NumeroDeArquivos = Diretório.GetFiles().Length; //Verifica o número de arquivos no diretório funcionando
-            NumeroDeArquivos = Directory.GetFiles(caminhoDoArquivo, "*.txt", SearchOption.TopDirectoryOnly).Length; //Conta o númeor de arquivos *.txt do diretório atual somente
+            NumeroDeArquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly).Length; //Conta o númeor de arquivos *.txt do diretório atual somente
 
-            //para teste
+            string[] arquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly); //Capitura o nome de todos arquivos *.txt do diretório
+
+            FileInfo infoArquivo; //Para obter informações do arquivo como nome.
+            
+            //===================para teste=============================================
             MessageBox.Show("Temos " + NumeroDeArquivos.ToString() + " arquivos *.txt.");
 
+            Console.WriteLine("Arquivo:");
+            foreach (string arq in arquivos)
+            {
+                infoArquivo = new FileInfo(arq);
+                Console.WriteLine(infoArquivo.Name);
+            }
+            //===========================================================================
+            Console.WriteLine("Concatenando...");
+            string caminhoSalvar = caminhoDoDiretorio+@"\Histórico Concatenado";
+            string salvarComo = caminhoSalvar+@"\HistóricoConcatenado.txt";
+
+            if (!Directory.Exists(caminhoSalvar)) //Verifica se o diretório existe, caso não exista ele cria
+            {
+                Directory.CreateDirectory(caminhoSalvar);
+            }
+            
+            if (File.Exists(salvarComo)) //Se o arquivo existe, então delete para criar um novo
+            {
+                File.Delete(salvarComo);
+            }
+            
+            foreach (string arq in arquivos)
+            {
+                Console.WriteLine(arq);
+                FormatarArquivoDeCotações(arq,salvarComo);
+            }
+            Console.WriteLine("Concatenação completa!!");
+            MessageBox.Show("Concatenação completa!!");
         }
     }
 }
