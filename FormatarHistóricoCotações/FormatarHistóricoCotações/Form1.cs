@@ -7,6 +7,7 @@ using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
 using System.Windows.Forms;
+using System.IO;
 
 namespace FormatarHistóricoCotações
 {
@@ -50,8 +51,23 @@ namespace FormatarHistóricoCotações
             }
         }
 
-        private void Salvar_Click(object sender, EventArgs e)
+        private void ConcatenaArquivos_Click(object sender, EventArgs e)
         {
+            openFileDialog1.InitialDirectory = @"C:\Users\Erasmo\Documents\GitHub\AnaliseMercado";
+            openFileDialog1.Filter = "Arquivos de Texto (*.txt)|*.txt";
+            openFileDialog1.FileName = "ANO.txt";
+            openFileDialog1.CheckFileExists = true;
+            openFileDialog1.CheckPathExists = false;
+            DialogResult result = openFileDialog1.ShowDialog();
+
+            if (result == DialogResult.OK)
+            {
+                FileInfo infoArquivo = new FileInfo(Path.GetFullPath(openFileDialog1.FileName));
+                caminhoDoArquivo = infoArquivo.DirectoryName;
+            }
+
+            HistóricoCotação histórico2 = new HistóricoCotação();
+            histórico2.ConcatenaArquivos(caminhoDoArquivo);
         }
     }
 }

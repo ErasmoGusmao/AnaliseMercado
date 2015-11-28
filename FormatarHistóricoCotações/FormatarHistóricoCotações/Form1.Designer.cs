@@ -32,6 +32,7 @@
             this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
             this.saveFileDialog1 = new System.Windows.Forms.SaveFileDialog();
             this.Abrir = new System.Windows.Forms.Button();
+            this.ConcatenaArquivos = new System.Windows.Forms.Button();
             this.SuspendLayout();
             // 
             // FormatarArquivo
@@ -58,11 +59,22 @@
             this.Abrir.UseVisualStyleBackColor = true;
             this.Abrir.Click += new System.EventHandler(this.button2_Click);
             // 
+            // ConcatenaArquivos
+            // 
+            this.ConcatenaArquivos.Location = new System.Drawing.Point(23, 42);
+            this.ConcatenaArquivos.Name = "ConcatenaArquivos";
+            this.ConcatenaArquivos.Size = new System.Drawing.Size(117, 48);
+            this.ConcatenaArquivos.TabIndex = 2;
+            this.ConcatenaArquivos.Text = "Concatena arquivos Históricos";
+            this.ConcatenaArquivos.UseVisualStyleBackColor = true;
+            this.ConcatenaArquivos.Click += new System.EventHandler(this.ConcatenaArquivos_Click);
+            // 
             // Form1
             // 
             this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
             this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
             this.ClientSize = new System.Drawing.Size(366, 249);
+            this.Controls.Add(this.ConcatenaArquivos);
             this.Controls.Add(this.Abrir);
             this.Controls.Add(this.FormatarArquivo);
             this.FormBorderStyle = System.Windows.Forms.FormBorderStyle.Fixed3D;
@@ -79,6 +91,7 @@
         private System.Windows.Forms.OpenFileDialog openFileDialog1;
         private System.Windows.Forms.SaveFileDialog saveFileDialog1;
         private System.Windows.Forms.Button Abrir;
+        private System.Windows.Forms.Button ConcatenaArquivos;
     }
 }
 

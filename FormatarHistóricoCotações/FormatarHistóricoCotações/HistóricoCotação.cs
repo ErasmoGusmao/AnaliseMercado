@@ -29,7 +29,7 @@ namespace FormatarHistóricoCotações
                 {
                     using (StreamReader reader = new StreamReader(caminhoDoArquivo))
                     {
-                        using (StreamWriter writer = new StreamWriter(caminhoParaSalvarArqivo, false))
+                        using (StreamWriter writer = new StreamWriter(caminhoParaSalvarArqivo, true))
                         {
 
                             try
@@ -93,6 +93,18 @@ namespace FormatarHistóricoCotações
             {
                 MessageBox.Show("Caminho do arquivo histórico não informado!", "Sua execução foi invalidada!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }
+        }
+
+        public void ConcatenaArquivos(string caminhoDoArquivo) 
+        {
+            System.IO.DirectoryInfo Diretório = new DirectoryInfo(caminhoDoArquivo);
+            int NumeroDeArquivos;
+            //NumeroDeArquivos = Diretório.GetFiles().Length; //Verifica o número de arquivos no diretório funcionando
+            NumeroDeArquivos = Directory.GetFiles(caminhoDoArquivo, "*.txt", SearchOption.TopDirectoryOnly).Length; //Conta o númeor de arquivos *.txt do diretório atual somente
+
+            //para teste
+            MessageBox.Show("Temos " + NumeroDeArquivos.ToString() + " arquivos *.txt.");
+
         }
     }
 }
