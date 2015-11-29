@@ -13,9 +13,9 @@ namespace FormatarHistóricoCotações
 {
     public partial class Form1 : Form
     {
-        string caminhoDoArquivo;
-        string caminhoDoDiretorio;
-        string caminhoParaSalvarArqivo;
+        string CaminhoDoArquivo;
+        string CaminhoDoDiretorio;
+        string CaminhoParaSalvarArqivo;
         HistóricoCotação histórico; 
         
         public Form1()
@@ -32,10 +32,10 @@ namespace FormatarHistóricoCotações
 
             if (result == DialogResult.OK)
             {
-                caminhoParaSalvarArqivo = saveFileDialog1.FileName;
+                CaminhoParaSalvarArqivo = saveFileDialog1.FileName;
             }
 
-            histórico.FormatarArquivoDeCotações(caminhoDoArquivo,caminhoParaSalvarArqivo);
+            histórico.FormatarArquivoDeCotações(CaminhoDoArquivo,CaminhoParaSalvarArqivo);
         }
 
         private void button2_Click(object sender, EventArgs e)
@@ -49,7 +49,7 @@ namespace FormatarHistóricoCotações
             
             if (result == DialogResult.OK)
             {
-                caminhoDoArquivo = openFileDialog1.FileName;
+                CaminhoDoArquivo = openFileDialog1.FileName;
             }
         }
 
@@ -65,10 +65,10 @@ namespace FormatarHistóricoCotações
             if (result == DialogResult.OK)
             {
                 FileInfo infoArquivo = new FileInfo(Path.GetFullPath(openFileDialog1.FileName));
-                caminhoDoDiretorio = infoArquivo.DirectoryName;
+                CaminhoDoDiretorio = infoArquivo.DirectoryName;
             }
 
-            histórico.ConcatenaArquivos(caminhoDoDiretorio);
+            histórico.ConcatenaArquivos(CaminhoDoDiretorio);
         }
     }
 }

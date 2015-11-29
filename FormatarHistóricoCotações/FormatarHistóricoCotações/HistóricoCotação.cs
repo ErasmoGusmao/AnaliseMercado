@@ -14,11 +14,14 @@ namespace FormatarHistóricoCotações
     {
         public string CaminhoDoArquivo { get; set; }
         public string CaminhoParaSalvarArquivo { get; set; }
+        public string CaminhoDoDiretorio { get; set; }
+        private bool invaliadação = false;
 
         public HistóricoCotação() //Construtor Pega o nome do arquivo de abertura e de salvamento
         {
             CaminhoDoArquivo = "";
             CaminhoParaSalvarArquivo = "";
+            CaminhoDoDiretorio = "";
         }
 
         public void FormatarArquivoDeCotações(string caminhoDoArquivo, string caminhoParaSalvarArqivo)
@@ -81,7 +84,9 @@ namespace FormatarHistóricoCotações
                             }
                             catch (FormatException)
                             {
-                                MessageBox.Show("Incapaz de ler arquivo com formato errado!", "Sua execução foi invalidada!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                FileInfo infoFile = new FileInfo(Path.GetFullPath(caminhoDoArquivo));
+                                MessageBox.Show("Incapaz de ler arquivo " + infoFile.Name + ", pois está formatado errado!", "Sua execução foi invalidada!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                                invaliadação = true; //Deleta pasta do arquivo concatenado
                             }
                         }
                     }
@@ -89,54 +94,144 @@ namespace FormatarHistóricoCotações
                 catch (FileNotFoundException)
                 {
                     MessageBox.Show("ARQUIVO NÃO ENCONTRADO!", "Sua execução foi invalidada!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    invaliadação = true; //Deleta pasta do arquivo concatenado
                 }
             }
             catch (ArgumentNullException)
             {
                 MessageBox.Show("Caminho do arquivo histórico não informado!", "Sua execução foi invalidada!", MessageBoxButtons.OK, MessageBoxIcon.Error);
-            }
+            }           
         }
 
         public void ConcatenaArquivos(string caminhoDoDiretorio) 
         {
-            int NumeroDeArquivos;
-            NumeroDeArquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly).Length; //Conta o númeor de arquivos *.txt do diretório atual somente
+            string[] arquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly);         //Captura o nome completo "C:\User\...\AAAA.txt" de todos arquivos *.txt do diretório
 
-            string[] arquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly); //Capitura o nome de todos arquivos *.txt do diretório
+            if (VerNomeArquivo(caminhoDoDiretorio))                                                                     //Método que verifiar se os arquivos dos diretórios informados são todos válidos retorna um bool true ou false
+            {
+                string caminhoSalvar = caminhoDoDiretorio + @"\Histórico Concatenado";
+                string salvarComo = caminhoSalvar + @"\HistóricoConcatenado.txt";
 
-            FileInfo infoArquivo; //Para obter informações do arquivo como nome.
-            
-            //===================para teste=============================================
-            MessageBox.Show("Temos " + NumeroDeArquivos.ToString() + " arquivos *.txt.");
+                //Bloco que verifica a existência ou não do diretório onde será salvo o arquivo concatenado "caminhoSalva"
+                if (!Directory.Exists(caminhoSalvar))
+                {
+                    Directory.CreateDirectory(caminhoSalvar);
+                }
+                if (File.Exists(salvarComo))
+                {
+                    File.Delete(salvarComo);
+                }
+                //Cabeçalho do arquivo concatenado
 
-            Console.WriteLine("Arquivo:");
-            foreach (string arq in arquivos)
-            {
-                infoArquivo = new FileInfo(arq);
-                Console.WriteLine(infoArquivo.Name);
-            }
-            //===========================================================================
-            Console.WriteLine("Concatenando...");
-            string caminhoSalvar = caminhoDoDiretorio+@"\Histórico Concatenado";
-            string salvarComo = caminhoSalvar+@"\HistóricoConcatenado.txt";
+                CabeçalhoArquivo(salvarComo);
 
-            if (!Directory.Exists(caminhoSalvar)) //Verifica se o diretório existe, caso não exista ele cria
-            {
-                Directory.CreateDirectory(caminhoSalvar);
+                //Bloco que concatena os arquivos do diretório "caminhoDoDiretorio" passado para esse método           
+                foreach (string arq in arquivos)
+                {
+                    Console.WriteLine(arq);
+                    FormatarArquivoDeCotações(arq, salvarComo);
+                }
+                //Bloco que verifica a validade do formato dos arquivos lidos
+                if (invaliadação)
+                {
+                    DeleteArquivo(salvarComo); //Deletar pasta onde o arquivo concatenado seria criado
+                    Console.WriteLine("Concatenação incompleta!");
+                    MessageBox.Show("Concatenação incompleta!", "Operação abortada", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                    invaliadação = false;
+                }
+                else
+                {
+                    Console.WriteLine("Concatenação completa!!");
+                    MessageBox.Show("Concatenação completa!!");
+                }
             }
-            
-            if (File.Exists(salvarComo)) //Se o arquivo existe, então delete para criar um novo
+            else
             {
-                File.Delete(salvarComo);
+                MessageBox.Show("Concatenação não concluida!!", "ERRO", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                Console.WriteLine("ERRO NO FORMADO DO ARQUIVO!");
             }
-            
-            foreach (string arq in arquivos)
-            {
-                Console.WriteLine(arq);
-                FormatarArquivoDeCotações(arq,salvarComo);
-            }
-            Console.WriteLine("Concatenação completa!!");
-            MessageBox.Show("Concatenação completa!!");
+
         }
+
+        private void CabeçalhoArquivo(string salvarComo)
+        {
+            using (StreamWriter writer = new StreamWriter(salvarComo, false)) {
+                writer.WriteLine("TIPREG\tDATA\tCODBDI\tCODNEG\tTPMERC\tNOMRES\tESPECI\tPRAZOT\tMODREF\tP.Abe\tP.Max\tP.Min\tP.Ult\tP.OFC\tP.OFV\tTotal NEG.\tQt.Total\tVolume Total\tP.EXE\tINDOPC\tDATA VENC.\tFATCOT\tPTOEXE\tCODISI\tDISMES");  //Escreve o Cabeçalho
+            } 
+        }
+
+        private void DeleteArquivo(string caminhoDoArquivoSalvo)
+        {
+
+            if (File.Exists(caminhoDoArquivoSalvo)) // Se o arquivo tiver sido criado, então delete!
+            {
+                File.Delete(caminhoDoArquivoSalvo);
+            }
+        }
+
+        private bool VerNomeArquivo(string caminhoDoDiretorio)
+        {
+            string[] arquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly);         //Captura o nome completo "C:\User\...\AAAA.txt" de todos arquivos *.txt do diretório
+            FileInfo infoArquivo;                                                                                       //Para obter informações do arquivo como nome, caminho do diretório, extenção, etc.
+                      
+            List<String> listaArquivos = new List<string>();                                                            //Cria uma lista onde serão armazenados os nomes dos arquivos
+            foreach (string arq in arquivos)
+            {
+                listaArquivos.Add(arq);                                                                                 //Armazeno os arquivos numa lista
+            }
+
+            //Bloco para validação dos nomes dos arquivos histórioco =============================================            
+            List<String> nomeDosArquivos = new List<string>();                                                          //Cria uma lista com o nome dos arquivos para serem verificados
+            List<int> anoArquivos = new List<int>();                                                                    //Cria uma lista com os anos dos arquivos para serem verificados
+
+            MessageBox.Show("Temos " + listaArquivos.Count.ToString() + " arquivos *.txt.");                            //Checagem
+            Console.WriteLine("Arquivo \t ANO");                                                                        //Checagem
+            int i = 0;
+            foreach (string listFile in listaArquivos)
+            {
+                infoArquivo = new FileInfo(listFile);
+                nomeDosArquivos.Add(infoArquivo.Name);                                                                  //Adiciona o nome dos arquivos a lista nomeDosArqivos
+                if (nomeDosArquivos[i].Length==8)                                                                       //Verifica se o arquivo tem nome de comprimento 8 AAAA.txt
+                {
+                    try
+                    {
+                        anoArquivos.Add(int.Parse(nomeDosArquivos[i].Substring(0, 4)));                                 //Converte o nome dos arquivos para ano e adicina a lista anoArqivos
+                        Console.WriteLine("Nome do Arquivo: " + nomeDosArquivos[i] + "\t" + "ANO: " + anoArquivos[i].ToString()); //Checagem
+                        i = ++i;
+                    }
+                    catch (FormatException)
+                    {
+                        MessageBox.Show("O arquivo " + nomeDosArquivos[i] + " não está no formato ano.txt (AAAA.txt)", "NOME DE ARQUIVO INVÁLIDO!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                        return false;                                                                     //Caso o arquvo não esteja no formato esperado então
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("O arquivo " + nomeDosArquivos[i] + " não está no formato ano.txt (AAAA.txt)", "NOME DE ARQUIVO INVÁLIDO!", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    return false;
+                }
+            }
+            //Bloco que verificar ordem dos nomes dos anos dos arquivos históricos======================
+            anoArquivos.Sort();                                                                                         //Ordena o ano dos arquivos do menor para o maior
+            int ano = anoArquivos[0];                                                                                   //Pego o primemiro ano
+            bool existeAno;
+
+            for (int cont = 0; cont < anoArquivos.Count; cont++)                                                        //Verifica se existe todos os anos esperados em ordem
+            {
+                existeAno = anoArquivos.Contains(ano);
+                if (existeAno)
+                {
+                    Console.WriteLine("Existe o ano de " + ano);                                                        //Checagem
+                    ano = ++ano;
+                }
+                else
+                {
+                    Console.WriteLine("Não existe o ano de " + ano);
+                    MessageBox.Show("Não existe o ano de " + ano,"ARQUIVO NÃO ENCONTRADO!",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+                    return false;
+                }
+            }
+            return true;
+        }        
     }
 }
