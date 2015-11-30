@@ -12,19 +12,65 @@ namespace FormatarHistóricoCotações
 {
     class HistóricoCotação
     {
-        public string CaminhoDoArquivo { get; set; }
-        public string CaminhoParaSalvarArquivo { get; set; }
-        public string CaminhoDoDiretorio { get; set; }
         private bool invaliadação = false;
 
-        public HistóricoCotação() //Construtor Pega o nome do arquivo de abertura e de salvamento
+        public void ConcatenaArquivos(string caminhoDoDiretorio) 
         {
-            CaminhoDoArquivo = "";
-            CaminhoParaSalvarArquivo = "";
-            CaminhoDoDiretorio = "";
+            try
+            {
+                string[] arquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly);         //Captura o nome completo "C:\User\...\AAAA.txt" de todos arquivos *.txt do diretório
+
+                if (VerNomeArquivo(caminhoDoDiretorio))                                                                     //Método que verifiar se os arquivos dos diretórios informados são todos válidos retorna um bool true ou false
+                {
+                    string caminhoSalvar = caminhoDoDiretorio + @"\Histórico Concatenado";
+                    string salvarComo = caminhoSalvar + @"\HistóricoConcatenado.txt";
+
+                    //Bloco que verifica a existência ou não do diretório onde será salvo o arquivo concatenado "caminhoSalva"
+                    if (!Directory.Exists(caminhoSalvar))
+                    {
+                        Directory.CreateDirectory(caminhoSalvar);
+                    }
+                    if (File.Exists(salvarComo))
+                    {
+                        File.Delete(salvarComo);
+                    }
+                    //Cabeçalho do arquivo concatenado
+
+                    CabeçalhoArquivo(salvarComo);
+
+                    //Bloco que concatena os arquivos do diretório "caminhoDoDiretorio" passado para esse método           
+                    foreach (string arq in arquivos)
+                    {
+                        Console.WriteLine(arq);
+                        FormatarArquivo(arq, salvarComo);
+                    }
+                    //Bloco que verifica a validade do formato dos arquivos lidos
+                    if (invaliadação)
+                    {
+                        DeleteArquivo(salvarComo); //Deletar pasta onde o arquivo concatenado seria criado
+                        Console.WriteLine("Concatenação incompleta!");
+                        MessageBox.Show("Concatenação incompleta!", "Operação abortada", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
+                        invaliadação = false;
+                    }
+                    else
+                    {
+                        Console.WriteLine("Concatenação completa!!");
+                        MessageBox.Show("Concatenação completa!!");
+                    }
+                }
+                else
+                {
+                    MessageBox.Show("Concatenação não concluida!!", "ERRO", MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    Console.WriteLine("ERRO NO FORMADO DO ARQUIVO!");
+                }
+            }
+            catch (ArgumentNullException)
+            {
+                MessageBox.Show("Diretório com arquivos não selecionado!","AVISO!",MessageBoxButtons.OK,MessageBoxIcon.Exclamation);
+            }
         }
 
-        public void FormatarArquivoDeCotações(string caminhoDoArquivo, string caminhoParaSalvarArqivo)
+        private void FormatarArquivo(string caminhoDoArquivo, string caminhoParaSalvarArqivo)
         {
             try
             {
@@ -101,56 +147,6 @@ namespace FormatarHistóricoCotações
             {
                 MessageBox.Show("Caminho do arquivo histórico não informado!", "Sua execução foi invalidada!", MessageBoxButtons.OK, MessageBoxIcon.Error);
             }           
-        }
-
-        public void ConcatenaArquivos(string caminhoDoDiretorio) 
-        {
-            string[] arquivos = Directory.GetFiles(caminhoDoDiretorio, "*.txt", SearchOption.TopDirectoryOnly);         //Captura o nome completo "C:\User\...\AAAA.txt" de todos arquivos *.txt do diretório
-
-            if (VerNomeArquivo(caminhoDoDiretorio))                                                                     //Método que verifiar se os arquivos dos diretórios informados são todos válidos retorna um bool true ou false
-            {
-                string caminhoSalvar = caminhoDoDiretorio + @"\Histórico Concatenado";
-                string salvarComo = caminhoSalvar + @"\HistóricoConcatenado.txt";
-
-                //Bloco que verifica a existência ou não do diretório onde será salvo o arquivo concatenado "caminhoSalva"
-                if (!Directory.Exists(caminhoSalvar))
-                {
-                    Directory.CreateDirectory(caminhoSalvar);
-                }
-                if (File.Exists(salvarComo))
-                {
-                    File.Delete(salvarComo);
-                }
-                //Cabeçalho do arquivo concatenado
-
-                CabeçalhoArquivo(salvarComo);
-
-                //Bloco que concatena os arquivos do diretório "caminhoDoDiretorio" passado para esse método           
-                foreach (string arq in arquivos)
-                {
-                    Console.WriteLine(arq);
-                    FormatarArquivoDeCotações(arq, salvarComo);
-                }
-                //Bloco que verifica a validade do formato dos arquivos lidos
-                if (invaliadação)
-                {
-                    DeleteArquivo(salvarComo); //Deletar pasta onde o arquivo concatenado seria criado
-                    Console.WriteLine("Concatenação incompleta!");
-                    MessageBox.Show("Concatenação incompleta!", "Operação abortada", MessageBoxButtons.OK, MessageBoxIcon.Exclamation);
-                    invaliadação = false;
-                }
-                else
-                {
-                    Console.WriteLine("Concatenação completa!!");
-                    MessageBox.Show("Concatenação completa!!");
-                }
-            }
-            else
-            {
-                MessageBox.Show("Concatenação não concluida!!", "ERRO", MessageBoxButtons.OK, MessageBoxIcon.Error);
-                Console.WriteLine("ERRO NO FORMADO DO ARQUIVO!");
-            }
-
         }
 
         private void CabeçalhoArquivo(string salvarComo)
